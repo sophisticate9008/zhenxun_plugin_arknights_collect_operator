@@ -14,7 +14,7 @@ from .utils.storage import read_file, save_file
 
 __plugin_meta__ = PluginMetadata(
     name="明日方舟干员收集",
-    description="项目",
+    description="消耗金币项目,卡池包含全部3星以上角色，按照游戏里的情况给黄票和保底增加概率",
     usage="""
     抽干员(?十连)
     干员(皮肤|立绘)(1|2|...)
