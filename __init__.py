@@ -14,7 +14,7 @@ from .utils.storage import read_file, save_file
 
 __plugin_meta__ = PluginMetadata(
     name="明日方舟干员收集",
-    description="项目",
+    description="金币收集三星以上全干员",
     usage="""
     抽干员(?十连)
     干员(皮肤|立绘)(1|2|...)

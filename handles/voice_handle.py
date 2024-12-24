@@ -153,7 +153,15 @@ def get_all_list() -> list[str]:
     return get_star_list(3) + get_star_list(4) + get_star_list(5) + get_star_list(6)
 
 
-guess = on_message(priority=996, block=False)
+async def is_handler_open(session: EventSession) -> bool:
+    global voice_guess_data
+    group_id = str(session.id2)  # 通过 event 获取群号
+    handler = voice_guess_data.get(group_id)
+    return bool(handler and handler.is_open)  # 只有条件满足才允许捕捉
+
+
+# 添加前置过滤
+guess = on_message(priority=996, block=False, rule=is_handler_open)
 
 
 @guess.handle()
