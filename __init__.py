@@ -24,7 +24,7 @@ __plugin_meta__ = PluginMetadata(
     """,
     extra=PluginExtraData(
         author="sophisticate9008",
-        version="0.1",
+        version="0.2",
         menu_type="群内小游戏",
         plugin_type=PluginType.NORMAL,
         configs=[

@@ -28,6 +28,9 @@ class ResultType(StrEnum):
     NoVoice = "听取的语音不存在"
 
 
+guess_time: int = 120
+
+
 @voice_matcher.handle()
 async def _(session: EventSession, operator: Match[str], title: Match[str]):
     operator_name = operator.result if operator.available else ""
@@ -101,7 +104,7 @@ class VoiceGuessHandler:
         self.task = asyncio.create_task(self.auto_close())
 
     async def auto_close(self):
-        await asyncio.sleep(120)
+        await asyncio.sleep(guess_time)
         self.is_open = False
 
     async def judge_answer_with_open(self, user_id: str, answer: str) -> bool | None:
@@ -126,6 +129,15 @@ async def _(session: EventSession):
         logger.info(f"猜语音答案{result}")
         handler = VoiceGuessHandler(group_id, result)
         voice_guess_data[group_id] = handler
+
+        async def warpper():
+            await asyncio.sleep(guess_time - 1)
+            if handler.is_open:
+                await MessageUtils.build_message(
+                    f"猜语音结束,答案是{handler.result}"
+                ).finish()
+
+        _ = asyncio.create_task(warpper())  # noqa: RUF006
     # 随机获取一个标题并从列表中移除
     if handler.titles:
         _title = random.choice(handler.titles)
