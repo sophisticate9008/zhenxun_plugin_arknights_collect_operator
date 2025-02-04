@@ -33,13 +33,13 @@ class PreNot(StrEnum):
 async def _(bot: Bot, session: EventSession, num: Match[str]):
     transaction = create_transaction()
     ctx = DrawHandleCtx(session=session, transaction=transaction)
-    draw_count = 10 if num.available else 1
+    draw_count = str_to_num(num.result) if num.available else 1
     if not ctx.get_user_id():
         await MessageUtils.build_message("用户id为空...").finish()
 
     list_prenot = []
     if not await before_draw(ctx, draw_count, list_prenot) and list_prenot:
-        await MessageUtils.build_message(str(list_prenot[0])).finish()
+        await MessageUtils.build_message(",".join(list_prenot)).finish()
     draw_result = await draw(ctx, draw_count)
     msg = await draw_result_to_msg(ctx, draw_result)
     receipt = await msg.send(reply_to=True)
@@ -61,6 +61,8 @@ async def draw_result_to_msg(
     """处理结果，转为消息，增加黄票"""
     msg_list = []
     ticket_add = 0
+
+    # 单抽情况
     if len(draw_result) == 1:
         name = draw_result[0][0]
         drawed_count = draw_result[0][1]
@@ -68,17 +70,32 @@ async def draw_result_to_msg(
         star_text = "★" * info.star
         img = await get_basic_painting_img(name, 1)
         ticket_add = cal_ticket(info.star, drawed_count)
-        text = f"本次抽到了{name},星级为{star_text},第{drawed_count}次抽到,获得{ticket_add}黄票"  # noqa: E501
+        text = f"本次抽到了{name}，星级为{star_text}，第{drawed_count}次抽到，获得{ticket_add}黄票"  # noqa: E501
         msg_list.extend((img, text))
+
+    # 十连及倍数情况
     elif len(draw_result) > 1:
-        img = await simulate_image(draw_result)
-        for _ in draw_result:
-            name = _[0]
-            drawed_count = _[1]
-            info = get_info_by_name(name)
-            ticket_add += cal_ticket(info.star, drawed_count)
-        text = f"获得{ticket_add}黄票"
-        msg_list.extend((img, text))
+        # 将结果按每10个分组
+        group_size = 10
+        groups = [
+            draw_result[i:i+group_size]
+            for i in range(0, len(draw_result), group_size)
+        ]
+        # 处理每个分组
+        for group in groups:
+            # 生成分组图片
+            img = await simulate_image(group)
+            msg_list.append(img)
+            # 累计黄票
+            for item in group:
+                name, drawed_count = item[0], item[1]
+                info = get_info_by_name(name)
+                ticket_add += cal_ticket(info.star, drawed_count)
+
+        # 添加总黄票信息
+        msg_list.append(f"累计获得{ticket_add}黄票")
+
+    # 写入数据库
     if ticket_add > 0:
         await exec_db_write(
             ctx.transaction,
@@ -230,3 +247,47 @@ async def _(session: EventSession, info_type: Match[str]):
         img = await generate_character_grid_pic(data_list)
         msg_list = [img, _type]
         await MessageUtils.build_message(msg_list).finish(reply_to=True)
+
+def str_to_num(_str: str) -> int:
+    # 定义中文数字到阿拉伯数字的映射
+    chinese_num_map = {
+        "一": 1,
+        "二": 2,
+        "三": 3,
+        "四": 4,
+        "五": 5,
+        "六": 6,
+        "七": 7,
+        "八": 8,
+        "九": 9,
+        "十": 10,
+        "百": 100,
+    }
+    # 如果字符串是纯阿拉伯数字
+    if _str.isdigit():
+        num = int(_str)
+        # 检查是否是十的倍数
+        if num % 10 == 0:
+            return num
+        return 1
+    # 如果字符串是中文数字
+    # 解析中文数字
+    num = 0
+    temp = 0
+    for char in _str:
+        if char in chinese_num_map:
+            if chinese_num_map[char] == 10:  # 十
+                temp = temp if temp != 0 else 1
+                num += temp * 10
+                temp = 0
+            elif chinese_num_map[char] == 100:  # 百
+                temp = temp if temp != 0 else 1
+                num += temp * 100
+                temp = 0
+            else:
+                temp += chinese_num_map[char]
+    num += temp
+    # 检查是否是十的倍数
+    if num % 10 == 0:
+        return num
+    return 1

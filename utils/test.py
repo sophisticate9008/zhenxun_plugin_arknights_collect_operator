@@ -260,6 +260,48 @@
 # generate_character_grid_with_shadow(example_data, "output_with_pink_border.png", cells_per_row=5)
 
 
+# def str_to_num(_str: str) -> int:
+#     # 定义中文数字到阿拉伯数字的映射
+#     chinese_num_map = {
+#         "一": 1,
+#         "二": 2,
+#         "三": 3,
+#         "四": 4,
+#         "五": 5,
+#         "六": 6,
+#         "七": 7,
+#         "八": 8,
+#         "九": 9,
+#         "十": 10,
+#         "百": 100,
+#     }
+#     # 如果字符串是纯阿拉伯数字
+#     if _str.isdigit():
+#         num = int(_str)
+#         # 检查是否是十的倍数
+#         if num % 10 == 0:
+#             return num
+#         return 1
+#     # 如果字符串是中文数字
+#     # 解析中文数字
+#     num = 0
+#     temp = 0
+#     for char in _str:
+#         if char in chinese_num_map:
+#             if chinese_num_map[char] == 10:  # 十
+#                 temp = temp if temp != 0 else 1
+#                 num += temp * 10
+#                 temp = 0
+#             elif chinese_num_map[char] == 100:  # 百
+#                 temp = temp if temp != 0 else 1
+#                 num += temp * 100
+#                 temp = 0
+#             else:
+#                 temp += chinese_num_map[char]
+#     num += temp
+#     # 检查是否是十的倍数
+#     if num % 10 == 0:
+#         return num
+#     return 1
 
-
-
+# print(str_to_num(""))
