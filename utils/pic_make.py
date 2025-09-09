@@ -5,7 +5,7 @@ from PIL.Image import Image as tImage
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
 from .. import global_arg
-from ..types import DrawResultType
+from ..arknights_types import DrawResultType
 from ..utils.storage import get_avatar_img, get_portrait_img
 from ..utils.operator import get_info_by_name
 from ..images import (
@@ -177,10 +177,7 @@ async def generate_character_grid_pic(
     # 将网格图像粘贴到最终背景
     final_background.paste(background, (10, 10))
     imageio = io.BytesIO()
-    final_background.save(
-        imageio,
-        format="PNG"
-    )
+    final_background.save(imageio, format="PNG")
     return imageio
 
 

@@ -19,6 +19,7 @@ async def fetch_json(url: str, params: dict | None = None) -> dict | None:
             return None
     return None
 
+
 async def fetch_media(url: str) -> io.BytesIO | None:
     """异步获取媒体文件字节流"""
     r = await AsyncHttpx.get(url=url)

@@ -3,7 +3,7 @@ from pathlib import Path
 from zhenxun.configs.config import Config
 from zhenxun.configs.path_config import DATA_PATH, FONT_PATH
 
-from .types import CargoQuery, OperatorInfo, VoiceHtmlPraseType
+from .arknights_types import CargoQuery, OperatorInfo, VoiceHtmlPraseType
 
 
 class Constant:
@@ -34,6 +34,7 @@ class Constant:
     )
     voice_text_url: str = "https://prts.wiki/index.php?title={}/语音记录&action=edit"
     char_portrait_url: str = "https://torappu.prts.wiki/assets/char_portrait/{}_1.png"
+    new_operator_page_url: str = "https://prts.wiki/w/%E9%A6%96%E9%A1%B5"
     file_path = DATA_PATH / "arknights_collect_operator/"
     font_path = FONT_PATH / "HYWenHei-85W.ttf"
     resource_path = Path(__file__).parent / "resource"
@@ -44,3 +45,4 @@ plugin_config = Config.get("zhenxun_plugin_arknights_collect_operator")
 cache_star_lists: dict[int, list[str]] = {3: [], 4: [], 5: [], 6: []}
 cache_operator_info_dict: dict[str, OperatorInfo] = {}
 voice_infos: VoiceHtmlPraseType = {}
+new_operators_by_rarity: dict[int, list[str]] = {3: [], 4: [], 5: [], 6: []}

@@ -3,7 +3,7 @@ import random
 import asyncio
 from hashlib import md5
 
-from lxml import etree
+from lxml import etree  # type: ignore
 
 from zhenxun.services.log import logger
 
@@ -12,7 +12,7 @@ from ..global_arg import Constant
 from .network import fetch_html_text
 from ..utils.utils import save_file
 from ..utils.operator import get_info_by_name
-from ..types import VoicePartType, VoiceUrlResultType
+from ..arknights_types import VoicePartType, VoiceUrlResultType
 
 
 def get_intact_url(text: str) -> str:
@@ -119,5 +119,5 @@ async def get_voice_url_and_text(name: str, title: str) -> VoiceUrlResultType | 
         url_voice_cn.replace("CN", "cn"),
         url_voice_jp.replace("CN", "cn"),
         voice_text,
-        voice_title
+        voice_title,
     )

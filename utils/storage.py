@@ -16,7 +16,6 @@ from .network import fetch_media
 from ..utils.utils import read_file, save_file
 
 
-
 async def get_basic_painting_img(name: str, index: int) -> io.BytesIO | None:
     """获取干员基础立绘图片"""
     url = intact_url.get_basic_url(name, index)
@@ -99,7 +98,6 @@ def sanitize_filename(url: str) -> str:
     invalid_chars = r'[<>:"/\\|?*\x00-\x1F]'  # 包含控制字符
     filename = re.sub(invalid_chars, "_", filename) or "default_file_name"
     return filename
-
 
 
 T = TypeVar("T", bound=BaseModel)

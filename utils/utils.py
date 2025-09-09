@@ -10,6 +10,7 @@ from tortoise.transactions import in_transaction
 
 from zhenxun.services.log import logger
 
+
 def create_transaction():
     return in_transaction()
 
@@ -21,6 +22,7 @@ async def exec_db_write(transaction: Any, *args):
         if isinstance(func, Callable):
             await func()
             # 执行每个无参匿名函数
+
 
 async def save_file(data: Any, file_path: str | Path):
     """

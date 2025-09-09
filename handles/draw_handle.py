@@ -12,7 +12,7 @@ from zhenxun.utils.withdraw_manage import WithdrawManager
 
 from .. import global_arg
 from ..models.db_model import OperatorCollect
-from ..types import DrawHandleCtx, DrawResultType
+from ..arknights_types import DrawHandleCtx, DrawResultType
 from ..utils.storage import get_basic_painting_img
 from ..matchers import draw_matcher, draw_info_matcher
 from ..utils.utils import exec_db_write, create_transaction
@@ -156,8 +156,26 @@ async def draw_assist(
     if rand_value < rand_l or rand_value >= rand_r:  # 未命中
         return None
 
-    list_star = get_star_list(star_value)
-    result_name = random.choice(list_star)
+    # --- NEW LOGIC FOR WEIGHTED DRAWING ---
+    new_operators_for_star = global_arg.new_operators_by_rarity.get(star_value, [])
+    result_name = ""
+
+    if new_operators_for_star and random.random() < 0.5:
+        # 50% chance to get a new operator if new operators exist for this star level
+        result_name = random.choice(new_operators_for_star)
+    else:
+        # 50% chance to get an operator from the regular pool (or fallback to all if no new)
+        all_operators_for_star = get_star_list(star_value)
+        
+        # Filter out new operators from the regular pool to avoid double counting
+        regular_operators = [op for op in all_operators_for_star if op not in new_operators_for_star]
+        
+        if not regular_operators: # Fallback in case all operators of a rarity are new or no regular operators
+            regular_operators = all_operators_for_star
+        
+        result_name = random.choice(regular_operators)
+    # --- END NEW LOGIC ---
+
     await exec_db_write(
         ctx.transaction,
         lambda: OperatorCollect.operator_record(str(ctx.get_user_id()), result_name),

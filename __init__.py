@@ -8,9 +8,10 @@ from zhenxun.services.log import logger
 from zhenxun.utils.enum import PluginType
 from zhenxun.configs.utils import RegisterConfig, PluginExtraData
 
-from .types import CargoQuery
+from .arknights_types import CargoQuery
 from .utils.network import fetch_json
 from .utils.storage import read_file, save_file
+from .utils.operator import update_new_operators, load_new_operators_from_file
 
 __plugin_meta__ = PluginMetadata(
     name="明日方舟干员收集",
@@ -90,14 +91,19 @@ async def get_cargo_data():
 async def get_voice_part():
     file_content = await read_file(global_arg.Constant.file_path / "voice_infos.json")
     if file_content:
-        global_arg.voice_infos = json.loads(
-            str(file_content)
-        )
+        global_arg.voice_infos = json.loads(str(file_content))
         logger.info("从本地获取解析过的语音数据")
+
+
+async def get_new_operator_data():
+    await load_new_operators_from_file()
+    await update_new_operators()
 
 
 driver.on_startup(get_cargo_data)
 driver.on_startup(get_voice_part)
+driver.on_startup(get_new_operator_data)
+
 
 @scheduler.scheduled_job(
     "interval",
@@ -105,6 +111,7 @@ driver.on_startup(get_voice_part)
 )
 async def _():
     await get_cargo_data()
+    await get_new_operator_data()
     global_arg.cache_star_lists = {}
 
 
